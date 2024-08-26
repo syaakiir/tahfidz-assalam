@@ -83,7 +83,7 @@
             <br />
 
             <div>
-                <p style="text-align: center;">©2024 SIS-Tahfidz.</p>
+                <p style="text-align: center;">©2024 Tahfidz As Salam.</p>
             </div>
 
         </div>
