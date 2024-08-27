@@ -81,6 +81,16 @@ Breadcrumbs::for('profile', function ($trail) {
     $trail->push('Profile Pengguna', route('profile'));
 });
 
+// Monitoring
+Breadcrumbs::for('monitoring', function ($trail) {
+    $trail->push('Laporan Santri', route('monitoring'));
+});
+
+Breadcrumbs::for('create-monitoring', function ($trail) {
+    $trail->parent('monitoring');
+    $trail->push('Laporan Hafalan', route('monitoring'));
+});
+
 // Assessment
 Breadcrumbs::for('assessment', function ($trail) {
     $trail->push('Penilaian Santri', route('assessment'));

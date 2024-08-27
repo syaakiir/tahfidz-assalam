@@ -2,6 +2,7 @@
 
 namespace App\Model\Siswa;
 
+use App\Model\SiswaHasSurah\SiswaHasSurah;
 use Auth;
 
 use App\Model\User\User;
@@ -109,6 +110,10 @@ class Siswa extends Model
             default:
                 return '';
         }
+    }
+    public function SiswaHasSurah()
+    {
+        return $this->hasMany(SiswaHasSurah::class, 'siswa_id');
     }
 
 }

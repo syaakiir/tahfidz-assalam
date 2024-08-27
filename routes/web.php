@@ -104,6 +104,16 @@ $router->group(['prefix' => 'profile'], function () use ($router) {
 });
 
 
+// Untuk Monitoring
+$router->group(['prefix' => 'monitoring'], function () use ($router) {
+	$router->get('/',  ['as'=>'monitoring','uses' => 'MonitoringController@index']);
+	$router->get('/monitoring/{type}',  ['as'=>'create-monitoring','uses' => 'MonitoringController@monitoring']);
+	$router->get('/get-surah',  ['as'=>'get-surah','uses' => 'MonitoringController@getSurah']);
+	$router->get('/get-total-ayat',  ['as'=>'get-ayat','uses' => 'MonitoringController@getAyat']);
+	$router->get('/get-total-page',  ['as'=>'get-page','uses' => 'MonitoringController@getPage']);
+	$router->post('/do-monitoring',  ['as'=>'do-monitoring','uses' => 'MonitoringController@doMonitoring']);
+});
+
 // Untuk Assessment
 $router->group(['prefix' => 'assessment'], function () use ($router) {
 	$router->get('/',  ['as'=>'assessment','uses' => 'AssessmentController@index']);

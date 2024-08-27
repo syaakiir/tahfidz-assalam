@@ -30,6 +30,7 @@ class User extends Authenticatable
     const ACCOUNT_TYPE_PARENT = 30;
     const ACCOUNT_TYPE_TEACHER = 40;
 
+
     /**
      * The attributes that are mass assignable.
      *

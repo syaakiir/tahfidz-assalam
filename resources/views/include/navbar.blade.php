@@ -59,6 +59,15 @@ $user = Auth::user();
             </li>
         @endif
 
+        @if ($user->account_type == User::ACCOUNT_TYPE_PARENT)
+            <li class="<?= $active == 'monitoring' ? 'active' : '' ?>">
+                <a href="<?= URL::to('/monitoring') ?>">
+                    <i class="pe-7s-note2"></i>
+                    <p style="color: yellow">Monitoring</p>
+                </a>
+            </li>
+        @endif
+
     </ul>
 </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Model\Surah;
 
+use App\Model\SiswaHasSurah\SiswaHasSurah;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -38,6 +39,10 @@ class Surah extends Model
     public static function getSurah($search=null)
     {
         return self::where('surah_name', 'like', '%'.$search.'%')->get();
+    }
+    public function hasSurah()
+    {
+        return $this->hasMany(SiswaHasSurah::class, 'surah_id');
     }
 
 }

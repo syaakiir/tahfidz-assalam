@@ -136,6 +136,8 @@ class NotificationController extends Controller
             $all_user_parent = User::where('account_type', User::ACCOUNT_TYPE_PARENT)->get();
 
             foreach ($all_user_parent as $user_parent) {
+
+                $user_notification = new UserNotification();
                
                 $user_notification->notification_id = $notification->id;
                 $user_notification->user_id = $user_parent->id;
