@@ -112,6 +112,9 @@ $router->group(['prefix' => 'monitoring'], function () use ($router) {
 	$router->get('/get-total-ayat',  ['as'=>'get-ayat','uses' => 'MonitoringController@getAyat']);
 	$router->get('/get-total-page',  ['as'=>'get-page','uses' => 'MonitoringController@getPage']);
 	$router->post('/do-monitoring',  ['as'=>'do-monitoring','uses' => 'MonitoringController@doMonitoring']);
+	$router->post('/get-detail',  ['as'=>'detail-monitoring','uses' => 'MonitoringController@show']);
+	$router->post('/update',  ['as'=>'update-monitoring','uses' => 'MonitoringController@update']);
+	$router->post('/store',  ['as'=>'store-monitoring','uses' => 'MonitoringController@store']);
 });
 
 // Untuk Assessment

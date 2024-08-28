@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use DB;
 
+use Carbon\Carbon;
+
+use App\Model\User\User;
+use App\Model\Siswa\Siswa;
+use App\Model\Surah\Surah;
+
+
+
+use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
-use App\Model\Siswa\Siswa;
+
 use App\Model\StudentClass\StudentClass;
-use App\Model\User\User;
-
-
-
-use App\Model\Surah\Surah;
-use App\Model\SiswaHasSurah\SiswaHasSurah;
-
 
 use App\Model\AssessmentLog\AssessmentLog;
+
+use App\Model\SiswaHasSurah\SiswaHasSurah;
 
 use App\Http\Resources\Siswa\SiswaResource;
 
 use App\Http\Requests\Monitoring\MonitoringRequest;
-
-use Carbon\Carbon;
-
-use DB;
+use App\Http\Requests\Assessment\UpdateAssessmentRequest;
 
 class MonitoringController extends Controller
 {
@@ -87,45 +88,43 @@ class MonitoringController extends Controller
     }
 }
 
-    public function monitoring($id_siswa, Request $request)
-    {
-    	$data_siswa = Siswa::findOrFail($id_siswa);
-
-        if ($request->ajax()) 
-        {
-
-            $data = AssessmentLog::where('siswa_id',$id_siswa)->orderBy('created_at', 'desc')->get();
-
-            return Datatables::of($data)
-                ->addIndexColumn()
-                ->addColumn('monitoring', function(AssessmentLog $data) {
-                    return $data->monitoring;
-                })
-                ->addColumn('date', function(AssessmentLog $date) {
-                    $date =  Carbon::parse($date->date);
-                    return $date->format('d M Y h:i');
-                })
-                ->rawColumns(['action'])
-                ->toJson();
-        }
-
-        if($this->getUserPermission('create monitoring'))
-        {
-            if($data_siswa->memorization_type == Siswa::TYPE_MURAJAAH || $data_siswa->memorization_type == Siswa::TYPE_HAFALAN)
+public function monitoring($id_siswa, Request $request)
 {
-                $this->systemLog(false,'Mengakses Halaman Monitoring');           
-                return view('monitoring.monitoring_quran',[
-                    'active'=>'monitoring',
-                    'data_siswa'=>$data_siswa
-                ]);
-            }
-        }
-        else
-        {
-            $this->systemLog(true,'Gagal Mengakses Halaman Monitoring');
-            return view('error.unauthorized', ['active'=>'monitoring']);
-        } 
+    $data_siswa = Siswa::findOrFail($id_siswa);
+
+    if ($request->ajax()) 
+    {
+        $data = AssessmentLog::where('siswa_id', $id_siswa)->orderBy('created_at', 'desc')->get();
+
+        return Datatables::of($data)
+            ->addIndexColumn()
+            ->addColumn('monitoring', function(AssessmentLog $data) {
+                return $data->monitoring;
+            })
+            ->addColumn('date', function(AssessmentLog $date) {
+                $date = Carbon::parse($date->date);
+                return $date->format('d M Y h:i');
+            })
+            ->addColumn('action', function($row) {
+                $btn = '<button onclick="btnUbah('.$row->id.')" name="btnUbah" type="button" class="btn btn-info"><span class="glyphicon glyphicon-edit"></span></button>';
+                return $btn;
+            })
+            ->rawColumns(['action'])
+            ->toJson();
     }
+
+    if($this->getUserPermission('create monitoring'))
+    {
+        return view('monitoring.monitoring_quran',[
+            'active'=>'monitoring',
+            'data_siswa'=>$data_siswa
+        ]);
+    }
+    else
+    {
+        return view('error.unauthorized', ['active'=>'monitoring']);
+    } 
+}
 
     /**
      * @return void
@@ -237,4 +236,54 @@ class MonitoringController extends Controller
             return json_encode($arr_data);
         }
     }
+    // public function update(UpdateAssessmentRequest $request)
+    // {
+    //     if ($request->ajax()) {
+
+    //         DB::beginTransaction();
+
+    //         $monitoring_log = new AssessmentLog();
+    //         $monitoring_log->siswa_id = $request->get('id_siswa');
+    //         $monitoring_log->feedback = $request->get('feedback');
+
+
+    //         if(!$monitoring_log->save())
+    //         {
+    //             DB::rollBack();
+    //             return $this->getResponse(false,400,'','Kelas gagal diupdate');
+    //         }
+
+    //         if($this->getUserPermission('update monitoring'))
+    //         {
+    //             DB::commit();
+    //             return $this->getResponse(true,200,'','Kelas berhasil diupdate');
+    //         }
+    //         else
+    //         {
+    //             DB::rollBack();
+    //             return $this->getResponse(false,505,'','Tidak mempunyai izin untuk aktifitas ini');
+    //         }
+    //     }
+    // }
+    public function show(Request $request)
+{
+    $id = $request->input('id');
+    $data = AssessmentLog::find($id);
+
+    return response()->json(['data' => $data]);
+}
+
+public function update(Request $request)
+{
+    $id = $request->input('id');
+    $feedback = $request->input('feedback');
+
+    $log = AssessmentLog::find($id);
+    $log->feedback = $feedback;
+    $log->save();
+
+    return response()->json(['status' => true, 'message' => 'Data berhasil diperbarui']);
+}
+
+    
 }

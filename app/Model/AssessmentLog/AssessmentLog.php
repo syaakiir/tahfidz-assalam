@@ -20,7 +20,8 @@ class AssessmentLog extends Model
         'siswa_id', 
         'range',
         'date',
-        'assessment'
+        'assessment',
+        'feedback'
     ];
 
     public static $rules = [
@@ -28,6 +29,7 @@ class AssessmentLog extends Model
         'range' => 'required | string',
         'date' => 'required | date',
         'assessment' => 'required | string',
+        'feedback' => 'required | string',
     ];
 
     /**

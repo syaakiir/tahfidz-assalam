@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 use App\Model\Siswa\Siswa;
 
-class AssessmentRequest extends FormRequest
+class UpdateAssessmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
