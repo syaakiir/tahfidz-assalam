@@ -1,9 +1,8 @@
 @extends('master')
 
-@section('title', '')
+@section('title', 'Data Assessment')
 
-@section('content')
-
+@section('alert')
     @if (Session::has('alert_success'))
         @component('components.alert')
             @slot('class')
@@ -29,18 +28,19 @@
             @endslot
         @endcomponent
     @endif
-    <hr>
+@endsection
 
+@section('content')
     <div class="table-responsive">
         <table class="table table-bordered data-table display nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th width="30%">Surat </th>
-                    <th width="20%">Ayat </th>
-                    <th width="20%">Catatan / Nilai </th>
-                    <th width="40%">Tanggal </th>
-                    <th width="40%">Feedback </th>
-                    <th width="20%">Action </th>
+                    <th width="30%">Surat</th>
+                    <th width="20%">Ayat</th>
+                    <th width="20%">Catatan / Nilai</th>
+                    <th width="20%">Tanggal</th>
+                    <th width="20%">Feedback</th>
+                    <th width="10%">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,169 +48,70 @@
         </table>
     </div>
 @endsection
-@section('modal')
 
+@section('modal')
     <div class="modal fade" id="detailModal" role="dialog">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <p class="modal-title">feedback</p>
+                    <h4 class="modal-title">Update Feedback</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Feedback</label>
-                        <input type="text" class="form-control" value="" name="feedback" id="feedback">
+                        <input type="text" class="form-control" name="feedback" id="feedback">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="update_data" class="btn btn-default pull-left">Update</button>
+                    <button type="button" class="btn btn-primary" id="update_data">Update</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
     <script type="text/javascript">
-        var id_ayat;
-        var total_ayat;
-        var id_siswa = '{{ $data_siswa->id }}';
+        var idassessment;
         var table;
 
-        // function btnUbah() {
-        //     clearAll(); 
-
-        //     $.ajax({
-        //         type: 'POST',
-        //         url: base_url + '/monitoring/get-detail',
-        //         data: {
-        //             : ,
-        //             "_token": "{{ csrf_token() }}",
-        //         },
-        //         success: function(data) {
-        //             $('#detailModal').modal('toggle');
-        //             $('#feedback').val(data.data.feedback);
-        //         }
-        //     });
-
-        //     $('#update_data').off('click').on('click', function() {
-        //         var feedback = $('#feedback').val();
-
-        //         $.ajax({
-        //             type: 'POST',
-        //             url: base_url + '/monitoring/update',
-        //             data: {
-        //                 : ,
-        //                 "_token": "{{ csrf_token() }}",
-        //                 feedback: feedback
-        //             },
-        //             success: function(data) {
-        //                 if (data.status != false) {
-        //                     swal(data.message, {
-        //                         button: false,
-        //                         icon: "success",
-        //                         timer: 1000
-        //                     });
-        //                     $("#detailModal .close").click();
-        //                 } else {
-        //                     swal(data.message, {
-        //                         button: false,
-        //                         icon: "error",
-        //                         timer: 1000
-        //                     });
-        //                 }
-        //                 table.ajax.reload();
-        //             },
-        //             error: function(error) {
-        //                 swal('Terjadi kegagalan sistem', {
-        //                     button: false,
-        //                     icon: "error",
-        //                     timer: 1000
-        //                 });
-        //             }
-        //         });
-        //     });
-        // }
-
         function btnUbah(id) {
-            clearAll();
-
+            idassessment = id;
             $.ajax({
                 type: 'POST',
                 url: base_url + '/monitoring/get-detail',
                 data: {
-                    id: id, // Passing ID di sini
-                    "_token": "{{ csrf_token() }}",
+                    idassessment: idassessment,
+                    "_token": "{{ csrf_token() }}"
                 },
                 success: function(data) {
-                    $('#detailModal').modal('toggle');
                     $('#feedback').val(data.data.feedback);
+                    $('#detailModal').modal('show');
+                },
+                error: function() {
+                    swal('Failed to fetch details', {
+                        button: false,
+                        icon: "error",
+                        timer: 1000
+                    });
                 }
-            });
-
-            $('#update_data').off('click').on('click', function() {
-                var feedback = $('#feedback').val();
-
-                $.ajax({
-                    type: 'POST',
-                    url: base_url + '/monitoring/update',
-                    data: {
-                        id: id, // Passing ID di sini untuk update
-                        "_token": "{{ csrf_token() }}",
-                        feedback: feedback
-                    },
-                    success: function(data) {
-                        if (data.status != false) {
-                            swal(data.message, {
-                                button: false,
-                                icon: "success",
-                                timer: 1000
-                            });
-                            $("#detailModal .close").click();
-                        } else {
-                            swal(data.message, {
-                                button: false,
-                                icon: "error",
-                                timer: 1000
-                            });
-                        }
-                        table.ajax.reload();
-                    },
-                    error: function(error) {
-                        swal('Terjadi kegagalan sistem', {
-                            button: false,
-                            icon: "error",
-                            timer: 1000
-                        });
-                    }
-                });
             });
         }
 
-
-
-        $(function() {
+        $(document).ready(function() {
             var url = '{{ route('create-monitoring', ':id') }}';
-            url = url.replace(':id', id_siswa);
+            url = url.replace(':id', '{{ $data_siswa->id }}');
 
             table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                bFilter: false,
-                bInfo: false,
-                rowReorder: {
-                    selector: 'td:nth-child(2)'
-                },
                 responsive: true,
-                "aaSorting": [
-                    [3, "desc"]
-                ],
                 ajax: url,
                 columns: [{
                         data: 'assessment',
-                        name: 'monitoring'
+                        name: 'assessment'
                     },
                     {
                         data: 'range',
@@ -232,46 +133,44 @@
                         data: 'action',
                         name: 'action',
                         orderable: false,
-                        searchable: false
-                    },
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return '<button class="btn btn-sm btn-primary" onclick="btnUbah(' + row
+                                .id + ')">Edit</button>';
+                        }
+                    }
                 ]
             });
-        });
 
-        $(document).ready(function() {
-
-            $('#surah_id').select2({
-                allowClear: true,
-                ajax: {
-                    url: base_url + '/monitoring/get-surah',
-                    dataType: 'json',
-                    data: function(params) {
-                        return {
-                            search: params.term
-                        }
-                    },
-                    processResults: function(data, page) {
-                        return {
-                            results: data
-                        };
-                    }
-                }
-            });
-
-            $("#surah_id").change(function() {
-                id_ayat = $(this).val();
+            $('#update_data').click(function() {
+                var feedback = $('#feedback').val();
                 $.ajax({
-                    type: 'GET',
-                    url: base_url + '/monitoring/get-total-ayat',
+                    type: 'POST',
+                    url: base_url + '/monitoring/update',
                     data: {
-                        id_ayat: id_ayat,
+                        idassessment: idassessment, // Ensure this ID is correct
                         "_token": "{{ csrf_token() }}",
+                        feedback: feedback
                     },
                     success: function(data) {
-                        total_ayat = data;
+                        if (data.status) {
+                            swal(data.message, {
+                                button: false,
+                                icon: "success",
+                                timer: 1000
+                            });
+                            $('#detailModal').modal('hide');
+                            table.ajax.reload();
+                        } else {
+                            swal(data.message, {
+                                button: false,
+                                icon: "error",
+                                timer: 1000
+                            });
+                        }
                     },
-                    error: function(error) {
-                        swal('Terjadi kegagalan sistem', {
+                    error: function() {
+                        swal('Failed to update feedback', {
                             button: false,
                             icon: "error",
                             timer: 1000
@@ -279,7 +178,6 @@
                     }
                 });
             });
-
 
 
         });

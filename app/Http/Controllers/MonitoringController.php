@@ -3,27 +3,14 @@
 namespace App\Http\Controllers;
 
 use DB;
-
 use Carbon\Carbon;
-
+use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
 use App\Model\User\User;
 use App\Model\Siswa\Siswa;
 use App\Model\Surah\Surah;
-
-
-
-use Illuminate\Http\Request;
-use Yajra\Datatables\Datatables;
-
-
-use App\Model\StudentClass\StudentClass;
-
 use App\Model\AssessmentLog\AssessmentLog;
-
-use App\Model\SiswaHasSurah\SiswaHasSurah;
-
-use App\Http\Resources\Siswa\SiswaResource;
-
+use App\Http\Resources\Assessment\AssessmentResource;
 use App\Http\Requests\Monitoring\MonitoringRequest;
 use App\Http\Requests\Assessment\UpdateAssessmentRequest;
 
@@ -39,251 +26,158 @@ class MonitoringController extends Controller
         $this->middleware('auth');
     }
 
-     /**
-     * Show the application index.
+    /**
+     * Show the monitoring index.
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-
-     public function index(Request $request)
-{
-    if ($request->ajax()) {
-        if($this->getUserLogin()->account_type == User::ACCOUNT_TYPE_PARENT)
-        {
-            $data = Siswa::join('tbl_siswa_has_parent', 'tbl_siswa.id', '=', 'tbl_siswa_has_parent.siswa_id')
-                          ->where('tbl_siswa_has_parent.parent_id', $this->getUserLogin()->id)
-                          ->join('tbl_class', 'tbl_siswa.class_id', '=', 'tbl_class.id')
-                          ->get(['tbl_siswa.id','siswa_name','memorization_type','class_id']);
-        }
-        else
-        {
-            $data = Siswa::all();
-        }
-
-        return Datatables::of($data)
-            ->addIndexColumn()
-            ->addColumn('action', function($row){  
-                $btn = '<button name="btnMonitoring" onclick="btnAss('.$row->id.')" type="button" class="btn btn-info"><span class="glyphicon glyphicon-edit"></span></button>';
-                return $btn; 
-            })
-            ->addColumn('memorization_type', function(Siswa $value) {
-                return Siswa::getHafalanMeaning($value->memorization_type);
-            })
-            ->addColumn('class_id', function(Siswa $class) {
-                return $class->getClass->class_name.' ('.$class->getClass->angkatan.')';
-            })
-            ->rawColumns(['action'])
-            ->toJson();
-    }
-
-    if($this->getUserPermission('index monitoring'))
-    {
-        $this->systemLog(false,'Mengakses Halaman Monitoring');
-        return view('monitoring.index', ['active'=>'monitoring']);
-    }
-    else
-    {
-        $this->systemLog(true,'Gagal Mengakses Halaman Monitoring');
-        return view('error.unauthorized', ['active'=>'monitoring']);
-    }
-}
-
-public function monitoring($id_siswa, Request $request)
-{
-    $data_siswa = Siswa::findOrFail($id_siswa);
-
-    if ($request->ajax()) 
-    {
-        $data = AssessmentLog::where('siswa_id', $id_siswa)->orderBy('created_at', 'desc')->get();
-
-        return Datatables::of($data)
-            ->addIndexColumn()
-            ->addColumn('monitoring', function(AssessmentLog $data) {
-                return $data->monitoring;
-            })
-            ->addColumn('date', function(AssessmentLog $date) {
-                $date = Carbon::parse($date->date);
-                return $date->format('d M Y h:i');
-            })
-            ->addColumn('action', function($row) {
-                $btn = '<button onclick="btnUbah('.$row->id.')" name="btnUbah" type="button" class="btn btn-info"><span class="glyphicon glyphicon-edit"></span></button>';
-                return $btn;
-            })
-            ->rawColumns(['action'])
-            ->toJson();
-    }
-
-    if($this->getUserPermission('create monitoring'))
-    {
-        return view('monitoring.monitoring_quran',[
-            'active'=>'monitoring',
-            'data_siswa'=>$data_siswa
-        ]);
-    }
-    else
-    {
-        return view('error.unauthorized', ['active'=>'monitoring']);
-    } 
-}
-
-    /**
-     * @return void
-     */
-
-
-        
-
-     public function doMonitoring(MonitoringRequest $request)
-     {
-         DB::beginTransaction();
- 
-         $status_monitoring = null;
- 
-         if(Siswa::findOrFail($request->get('id_siswa'))->memorization_type == Siswa::TYPE_MURAJAAH || 
-         Siswa::findOrFail($request->get('id_siswa'))->memorization_type == Siswa::TYPE_HAFALAN)
-      {
-             $monitoring_log = new AssessmentLog();
-             $monitoring_log->siswa_id = $request->get('id_siswa');
-             $monitoring_log->range = $request->get('begin').'-'.$request->get('end');
-             $monitoring_log->date = Carbon::now();
-             $monitoring_log->monitoring = 'Surat '.Surah::findOrFail($request->get('surah_id'))->surah_name;
-             $monitoring_log->note = $request->get('not');
- 
- 
-             for ($ayat = $request->get('begin'); $ayat <= $request->get('end'); $ayat++) 
-             {
-                 $monitoring = new SiswaHasSurah();
-                 $monitoring->siswa_id = $request->get('id_siswa');
-                 $monitoring->surah_id = $request->get('surah_id');
-                 $monitoring->ayat = $ayat;
-                 $monitoring->date = Carbon::now();
-                 $monitoring->note = $request->get('note');
-                 $monitoring->group_ayat = $request->get('begin').'-'.$request->get('end');
- 
-                 $old_data = SiswaHasSurah::MonitoringValidation($monitoring->siswa_id,$monitoring->surah_id,$monitoring->ayat);
- 
-
-             }
-         }
-        
-         if($this->getUserPermission('create monitoring'))
-         {            
-             $this->systemLog(false,'Melakukan Monitoring Kepada : '.$monitoring->siswa_id.'');
-             DB::commit();
- 
-             if($status_monitoring == 'RENEW')
-             {
-                 return redirect()->route('create-monitoring', [ 'type'=> $request->get('id_siswa') ])->with('alert_success', 'Penilaian telah berhasil diperbaharui');
-             }
-             else
-             {
-                 return redirect()->route('create-monitoring', [ 'type'=> $request->get('id_siswa') ])->with('alert_success', 'Berhasil Disimpan');
-             }  
-         }
-         else
-         {
-             DB::rollBack();
-             return redirect()->route('create-monitoring', [ 'type'=> $request->get('id_siswa') ])->with('alert_error', 'Gagal Disimpan');
-         }
-     }
-    /**
-     * @return void
-     */
-    public function getAyat(Request $request)
+    public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data_surah = Surah::findOrFail($request->get('id_ayat'));
-            $this->systemLog(false,'Menarik data Ayat');
-            return json_encode($data_surah->total_ayat);
+            if ($this->getUserLogin()->account_type == User::ACCOUNT_TYPE_PARENT) {
+                $data = Siswa::join('tbl_siswa_has_parent', 'tbl_siswa.id', '=', 'tbl_siswa_has_parent.siswa_id')
+                              ->where('tbl_siswa_has_parent.parent_id', $this->getUserLogin()->id)
+                              ->join('tbl_class', 'tbl_siswa.class_id', '=', 'tbl_class.id')
+                              ->get(['tbl_siswa.id', 'siswa_name', 'memorization_type', 'class_id']);
+            } else {
+                $data = Siswa::all();
+            }
+
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function($row) {  
+                    return '<button name="btnMonitoring" onclick="btnAss('.$row->id.')" type="button" class="btn btn-info">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>';
+                })
+                ->addColumn('memorization_type', function(Siswa $value) {
+                    return Siswa::getHafalanMeaning($value->memorization_type);
+                })
+                ->addColumn('class_id', function(Siswa $class) {
+                    return $class->getClass->class_name.' ('.$class->getClass->angkatan.')';
+                })
+                ->rawColumns(['action'])
+                ->toJson();
+        }
+
+        if ($this->getUserPermission('index monitoring')) {
+            $this->systemLog(false, 'Mengakses Halaman Monitoring');
+            return view('monitoring.index', ['active' => 'monitoring']);
+        } else {
+            $this->systemLog(true, 'Gagal Mengakses Halaman Monitoring');
+            return view('error.unauthorized', ['active' => 'monitoring']);
         }
     }
 
     /**
-     * @return void
+     * Monitor specific student.
+     *
+     * @param int $id_siswa
+     * @param Request $request
+     * @return \Illuminate\Contracts\Support\Renderable
      */
+    public function monitoring($id_siswa, Request $request)
+    {
+        $data_siswa = Siswa::findOrFail($id_siswa);
 
+        if ($request->ajax()) {
+            $data = AssessmentLog::where('siswa_id', $id_siswa)->orderBy('created_at', 'desc')->get();
+
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('monitoring', function(AssessmentLog $data) {
+                    return $data->monitoring;
+                })
+                ->addColumn('date', function(AssessmentLog $date) {
+                    return Carbon::parse($date->date)->format('d M Y h:i');
+                })
+                ->addColumn('action', function($row) {
+                    return '<button onclick="btnUbah('.$row->id.')" name="btnUbah" type="button" class="btn btn-info">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>';
+                })
+                ->rawColumns(['action'])
+                ->toJson();
+        }
+
+        if ($this->getUserPermission('create monitoring')) {
+            return view('monitoring.monitoring_quran', ['active' => 'monitoring', 'data_siswa' => $data_siswa]);
+        } else {
+            return view('error.unauthorized', ['active' => 'monitoring']);
+        }
+    }
 
     /**
-     * @return void
+     * Update assessment.
+     *
+     * @param UpdateAssessmentRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request)
+    {
+        if ($request->ajax()) {
+            DB::beginTransaction();
+            
+            try {
+                // Find the assessment log by its ID
+                $monitoring = AssessmentLog::findOrFail($request->get('idassessment'));
+                
+                // Update the feedback
+                $monitoring->feedback = $request->get('feedback');
+    
+                if ($monitoring->save()) {
+                    DB::commit();
+                    return response()->json(['status' => true, 'message' => 'Feedback successfully updated']);
+                } else {
+                    DB::rollBack();
+                    return response()->json(['status' => false, 'message' => 'Failed to update feedback']);
+                }
+            } catch (ModelNotFoundException $e) {
+                DB::rollBack();
+                return response()->json(['status' => false, 'message' => 'Record not found']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['status' => false, 'message' => 'An error occurred']);
+            }
+        }
+    }
+    
+
+    /**
+     * Get Surah list.
+     *
+     * @param Request $request
+     * @return string
      */
     public function getSurah(Request $request)
     {
         if ($request->ajax()) {
-            
-            if($request->has('search'))
-            {
-                $data_surah = Surah::getSurah($request->get('search'));
-            }
-            else
-            {
-                $data_surah = Surah::getSurah();
-            }
+            $data_surah = $request->has('search') ? Surah::getSurah($request->get('search')) : Surah::getSurah();
+            $arr_data = [];
 
-            $arr_data  = array();
-
-            if($data_surah)
-            {
-                $key = 0;
-
-                foreach ($data_surah as $data) {
+            if ($data_surah) {
+                foreach ($data_surah as $key => $data) {
                     $arr_data[$key]['id'] = $data->id;
                     $arr_data[$key]['text'] = $data->surah_name;
-                    $key++;
                 }
             }
 
-            $this->systemLog(false,'Menarik data Surah');
+            $this->systemLog(false, 'Menarik data Surah');
             return json_encode($arr_data);
         }
     }
-    // public function update(UpdateAssessmentRequest $request)
-    // {
-    //     if ($request->ajax()) {
 
-    //         DB::beginTransaction();
-
-    //         $monitoring_log = new AssessmentLog();
-    //         $monitoring_log->siswa_id = $request->get('id_siswa');
-    //         $monitoring_log->feedback = $request->get('feedback');
-
-
-    //         if(!$monitoring_log->save())
-    //         {
-    //             DB::rollBack();
-    //             return $this->getResponse(false,400,'','Kelas gagal diupdate');
-    //         }
-
-    //         if($this->getUserPermission('update monitoring'))
-    //         {
-    //             DB::commit();
-    //             return $this->getResponse(true,200,'','Kelas berhasil diupdate');
-    //         }
-    //         else
-    //         {
-    //             DB::rollBack();
-    //             return $this->getResponse(false,505,'','Tidak mempunyai izin untuk aktifitas ini');
-    //         }
-    //     }
-    // }
+    /**
+     * Get specific assessment.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show(Request $request)
-{
-    $id = $request->input('id');
-    $data = AssessmentLog::find($id);
-
-    return response()->json(['data' => $data]);
-}
-
-public function update(Request $request)
-{
-    $id = $request->input('id');
-    $feedback = $request->input('feedback');
-
-    $log = AssessmentLog::find($id);
-    $log->feedback = $feedback;
-    $log->save();
-
-    return response()->json(['status' => true, 'message' => 'Data berhasil diperbarui']);
-}
-
-    
+    {
+        if ($request->ajax()) {
+            $assessment = AssessmentLog::findOrFail($request->get('idassessment'));
+            return new AssessmentResource($assessment);
+        }
+    }
 }
