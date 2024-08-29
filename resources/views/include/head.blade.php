@@ -61,14 +61,6 @@ $user = Auth::user();
                     </li>
                 @endif
 
-                @if ($user->account_type == User::ACCOUNT_TYPE_CREATOR || $user->account_type == User::ACCOUNT_TYPE_ADMIN)
-                    <li>
-                        <a href="<?= URL::to('/notification') ?>">
-                            <p>Buat Notifikasi</p>
-                        </a>
-                    </li>
-                @endif
-
                 @if ($user->account_type != User::ACCOUNT_TYPE_CREATOR)
 
                     <li class="dropdown">

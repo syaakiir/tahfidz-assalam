@@ -8,11 +8,9 @@
 
 @section('content')
 
-
-    <fieldset>
-        <legend>Overview</legend>
-
-        @if (Auth::user()->account_type != 'ACCOUNT_TYPE_PARENT')
+    @if (Auth::user()->account_type != User::ACCOUNT_TYPE_PARENT)
+        <fieldset>
+            <legend>Overview</legend>
             <div class="col-md-4">
                 <div class="card">
                     <div class="header">
@@ -34,7 +32,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="card">
                     <div class="header">
@@ -45,11 +42,8 @@
                     </div>
                 </div>
             </div>
-        @endif
-
-
-    </fieldset>
-
+        </fieldset>
+    @endif
     <hr>
 
     <fieldset>

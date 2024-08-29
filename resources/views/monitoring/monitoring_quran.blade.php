@@ -35,8 +35,8 @@
         <table class="table table-bordered data-table display nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th width="30%">Surat</th>
-                    <th width="20%">Ayat</th>
+                    <th width="20%">Surat</th>
+                    <th width="10%">Ayat</th>
                     <th width="20%">Catatan / Nilai</th>
                     <th width="20%">Tanggal</th>
                     <th width="20%">Feedback</th>
@@ -135,8 +135,9 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            return '<button class="btn btn-sm btn-primary" onclick="btnUbah(' + row
-                                .id + ')">Edit</button>';
+                            return '<button class="btn btn-info" onclick="btnUbah(' + row
+                                .id +
+                                ')">  <span class="glyphicon glyphicon-edit"></span> Beri Feedback</button>';
                         }
                     }
                 ]

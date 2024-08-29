@@ -62,8 +62,17 @@ $user = Auth::user();
         @if ($user->account_type == User::ACCOUNT_TYPE_PARENT)
             <li class="<?= $active == 'monitoring' ? 'active' : '' ?>">
                 <a href="<?= URL::to('/monitoring') ?>">
-                    <i class="pe-7s-note2"></i>
+                    <i class="pe-7s-id"></i>
                     <p style="color: yellow">Monitoring</p>
+                </a>
+            </li>
+        @endif
+
+        @if ($user->account_type == User::ACCOUNT_TYPE_CREATOR || $user->account_type == User::ACCOUNT_TYPE_ADMIN)
+            <li class="<?= $active == 'notification' ? 'active' : '' ?>">
+                <a href="<?= URL::to('/notification') ?>">
+                    <i class="pe-7s-bell"></i>
+                    <p>Buat Notifikasi</p>
                 </a>
             </li>
         @endif
