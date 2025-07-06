@@ -40,8 +40,6 @@ $user = Auth::user();
 
                             <li><a href="<?= URL::to('/alquran') ?>"><span class="glyphicon glyphicon-book"
                                         aria-hidden="true"></span>&nbsp Qur'an </a></li>
-                            <li><a href="<?= URL::to('/action-log') ?>"><span class="glyphicon glyphicon-record"
-                                        aria-hidden="true"></span>&nbsp Log Sistem </a></li>
                         </ul>
                     </li>
                 @endif

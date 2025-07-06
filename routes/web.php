@@ -141,15 +141,14 @@ $router->group(['prefix' => 'student-report'], function () use ($router) {
 	$router->get('/print',  ['as'=>'student-report-print','uses' => 'StudentReportController@printPdf']);
 });
 
-// Untuk Action Log
-$router->group(['prefix' => 'action-log'], function () use ($router) {
-	$router->get('/',  ['as'=>'action-log','uses' => 'ActionLogController@index']);
-	$router->post('/remove',  ['as'=>'action-log-remove','uses' => 'ActionLogController@destroy']);
-});
-
 // Untuk Notification
 $router->group(['prefix' => 'notification'], function () use ($router) {
 	$router->get('/',  ['as'=>'notification','uses' => 'NotificationController@index']);
 	$router->post('/store',  ['as'=>'store-notification','uses' => 'NotificationController@store']);
 	$router->post('/get-detail',  ['as'=>'notification-get-detail','uses' => 'NotificationController@getDetail']);
+});
+// Untuk Action Log
+$router->group(['prefix' => 'action-log'], function () use ($router) {
+	$router->get('/',  ['as'=>'action-log','uses' => 'ActionLogController@index']);
+	$router->post('/remove',  ['as'=>'action-log-remove','uses' => 'ActionLogController@destroy']);
 });

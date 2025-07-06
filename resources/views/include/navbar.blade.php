@@ -54,7 +54,7 @@ $user = Auth::user();
             <li class="<?= $active == 'assessment' ? 'active' : '' ?>">
                 <a href="<?= URL::to('/assessment') ?>">
                     <i class="pe-7s-note2"></i>
-                    <p style="color: yellow">Penilaian Siswa</p>
+                    <p>Penilaian Siswa</p>
                 </a>
             </li>
         @endif
@@ -63,7 +63,7 @@ $user = Auth::user();
             <li class="<?= $active == 'monitoring' ? 'active' : '' ?>">
                 <a href="<?= URL::to('/monitoring') ?>">
                     <i class="pe-7s-id"></i>
-                    <p style="color: yellow">Monitoring</p>
+                    <p>Monitoring</p>
                 </a>
             </li>
         @endif

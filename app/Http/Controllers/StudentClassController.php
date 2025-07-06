@@ -232,7 +232,6 @@ class StudentClassController extends Controller
         }
     }
 
-    // ------------------------------ Aditional Function -------------------
-   
+
     
 }
