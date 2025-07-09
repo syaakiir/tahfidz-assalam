@@ -43,6 +43,49 @@ class AssessmentController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+    public function create($id)
+    {
+        $data_siswa = Siswa::findOrFail($id);
+        $surah_list = Surah::all();
+        $last_hafalan = $this->getLastHafalan($id);
+
+        return view('assessment.assessment_quran', [
+            'data_siswa' => $data_siswa,
+            'surah_list' => $surah_list,
+            'last_hafalan' => $last_hafalan,
+        ]);
+    }
+     public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_siswa' => 'required|exists:siswa,id',
+            'surah_id' => 'required|exists:surah,id',
+            'group_ayat' => 'required|string',
+            'ayat' => 'required|numeric|min:1',
+            'note' => 'nullable|string',
+        ]);
+
+        SiswaHasSurah::create([
+            'siswa_id' => $validated['id_siswa'],
+            'surah_id' => $validated['surah_id'],
+            'group_ayat' => $validated['group_ayat'],
+            'ayat' => $validated['ayat'],
+            'note' => $validated['note'] ?? null,
+            'date' => now(),
+        ]);
+
+        return redirect()->back()->with('alert_success', 'Data berhasil disimpan.');
+    }
+
+    /**
+     * Ambil hafalan terakhir siswa
+     */
+    private function getLastHafalan($id_siswa)
+    {
+        return SiswaHasSurah::where('siswa_id', $id_siswa)
+            ->orderByDesc('date')
+            ->first();
+    }
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -264,4 +307,16 @@ class AssessmentController extends Controller
             return json_encode($arr_data);
         }
     }
+    public function getTotalAyat(Request $request)
+{
+    $surahId = $request->input('surah_id');
+
+    // Ambil data total ayat dari tabel surah berdasarkan id surah
+    $surah = Surah::find($surahId);
+    
+    return response()->json([
+        'total_ayat' => $surah->total_ayat
+    ]);
+}
+
 }

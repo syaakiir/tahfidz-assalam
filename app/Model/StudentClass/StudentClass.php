@@ -87,4 +87,9 @@ class StudentClass extends Model
     {
         return $this->belongsTo('App\Model\Siswa\Siswa');
     }
+    public function className()
+{
+    return $this->belongsTo(\App\Models\ClassName::class, 'class_name_id');
+}
+
 }
