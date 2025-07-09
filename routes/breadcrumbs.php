@@ -29,6 +29,15 @@ Breadcrumbs::for('create-parent', function ($trail) {
     $trail->push('Tambah Orangtua', route('index-parent'));
 });
 
+// Nama Kelas
+Breadcrumbs::for('index-class-name', function ($trail) {
+    $trail->push('Nama Kelas', route('index-class-name'));
+});
+
+Breadcrumbs::for('create-class-name', function ($trail) {
+    $trail->parent('index-class-name');
+    $trail->push('Tambah Nama Kelas', route('create-class-name'));
+});
 
 // Kelas
 Breadcrumbs::for('student-class', function ($trail) {

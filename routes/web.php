@@ -60,6 +60,7 @@ $router->group(['prefix' => 'student-class'], function () use ($router) {
 	$router->post('/delete',  ['as'=>'delete-student-class','uses' => 'StudentClassController@delete']);
 	$router->post('/get-detail',  ['as'=>'detail-student','uses' => 'StudentClassController@show']);
 	$router->post('/update',  ['as'=>'update-student','uses' => 'StudentClassController@update']);
+	$router->get('/student-class/get-class-names', ['as' => 'get-class-names', 'uses' => 'StudentClassController@getClassNames']);			
 });
 
 // Untuk Siswa
@@ -152,9 +153,12 @@ $router->group(['prefix' => 'action-log'], function () use ($router) {
 	$router->get('/',  ['as'=>'action-log','uses' => 'ActionLogController@index']);
 	$router->post('/remove',  ['as'=>'action-log-remove','uses' => 'ActionLogController@destroy']);
 });
-Route::prefix('class-name')->group(function () {
-    Route::get('/', [\App\Http\Controllers\ClassNameController::class, 'index'])->name('class-name.index');
-    Route::post('/store', [\App\Http\Controllers\ClassNameController::class, 'store'])->name('class-name.store');
-    Route::post('/update/{id}', [\App\Http\Controllers\ClassNameController::class, 'update'])->name('class-name.update');
-    Route::post('/delete/{id}', [\App\Http\Controllers\ClassNameController::class, 'destroy'])->name('class-name.delete');
+// Untuk Class Name
+$router->group(['prefix' => 'class-name'], function () use ($router) {
+    $router->get('/', ['as' => 'index-class-name', 'uses' => 'ClassNameController@index']);
+    $router->get('/create', ['as' => 'create-class-name', 'uses' => 'ClassNameController@create']);
+    $router->post('/store', ['as' => 'store-class-name', 'uses' => 'ClassNameController@store']);
+    $router->post('/delete', ['as' => 'delete-class-name', 'uses' => 'ClassNameController@delete']);
+    $router->post('/get-detail', ['as' => 'detail-class-name', 'uses' => 'ClassNameController@show']);
+    $router->post('/update', ['as' => 'update-class-name', 'uses' => 'ClassNameController@update']);
 });

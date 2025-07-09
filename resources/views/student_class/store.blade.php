@@ -28,13 +28,13 @@
 			@endif
         </div>
 
-		<div class="form-group">
-			<label>Kelas</label>
-			<input type="text" class="form-control" value="" name="class_name">
-			@if ($errors->has('class_name'))
-			    <div class="error"><p style="color: red"><span>&#42;</span> {{ $errors->first('class_name') }}</p></div>
-			@endif
-		</div>
+<div class="form-group">
+    <label>Kelas</label>
+    <select class="js-example-basic-single form-control" id="class_name" name="class_name" style="width: 100%"></select>
+    @if ($errors->has('class_name'))
+        <div class="error"><p style="color: red"><span>&#42;</span> {{ $errors->first('class_name') }}</p></div>
+    @endif
+</div>
 
 		<div class="form-group">
 			<label>Catatan</label>
@@ -55,6 +55,7 @@
 @push('scripts')
 <script type="text/javascript">
 	$(document).ready(function() {
+
 	    $('#guru').select2({
 	    	allowClear: true,
 			placeholder: 'Masukkan Nama Guru',
@@ -73,6 +74,26 @@
 				}
 			}
 	    });
+
+	    $('#class_name').select2({
+		    allowClear: true,
+		    placeholder: 'Pilih Nama Kelas',
+		    ajax: {
+		        url: base_url + '/student-class/get-class-names',
+		        dataType: 'json',
+		        data: function(params) {
+		            return {
+		                search: params.term
+		            }
+		        },
+		        processResults: function (data) {
+		            return {
+		                results: data
+		            };
+		        }
+		    }
+		});
+
 	});
 </script>
 @endpush

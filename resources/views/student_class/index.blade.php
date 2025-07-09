@@ -78,10 +78,13 @@
                         <?= $guru_option ?>
                     </div>
 
-                    <div class="form-group">
-                        <label>Kelas</label>
-                        <input type="text" class="form-control" value="" name="class_name" id="class_name">
-                    </div>
+<div class="form-group">
+    <label>Kelas</label>
+    <select class="form-control js-example-basic-single" name="class_name" id="class_name" style="width: 100%">
+        <option></option>
+    </select>
+</div>
+
 
                     <div class="form-group">
                         <label>Catatan</label>
@@ -113,7 +116,7 @@
 
         function btnUbah(id) {
             clearAll();
-
+            callKelas();
             callGuru();
 
             idclass = id;
@@ -128,7 +131,7 @@
                     $('#detailModal').modal('toggle');
                     $('#angkatan').val(data.data.angkatan);
                     $('#guru').val(data.data.teacher.id).trigger('change');
-                    $('#class_name').val(data.data.class_name);
+                    $('#class_name').val(data.data.class_name).trigger('change');
                     $('#note').val(data.data.note);
                 }
             });
@@ -203,6 +206,27 @@
                 }
             });
         }
+function callKelas() {
+    $('#class_name').select2({
+        allowClear: true,
+        placeholder: 'Pilih Nama Kelas',
+        ajax: {
+            url: base_url + '/student-class/get-class-names',
+            dataType: 'json',
+            data: function(params) {
+                return {
+                    search: params.term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            }
+        }
+    });
+}
+
 
         $(function() {
             table = $('.data-table').DataTable({

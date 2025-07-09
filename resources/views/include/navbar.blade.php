@@ -35,7 +35,12 @@ $user = Auth::user();
                     <p>Orang Tua</p>
                 </a>
             </li>
-
+            <li class="<?= $active == 'class_name' ? 'active' : '' ?>">
+    <a href="<?= URL::to('/class-name') ?>">
+        <i class="pe-7s-notebook"></i>
+        <p>Nama Kelas</p>
+    </a>
+</li>
             <li class="<?= $active == 'student_class' ? 'active' : '' ?>">
                 <a href="<?= URL::to('/student-class') ?>">
                     <i class="pe-7s-note2"></i>

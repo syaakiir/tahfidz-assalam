@@ -8,6 +8,7 @@ use Yajra\Datatables\Datatables;
 
 use App\Model\User\User;
 use App\Model\StudentClass\StudentClass;
+use App\Model\ClassName\ClassName;
 
 use App\Http\Requests\StudentClass\StoreStudentClassRequest;
 use App\Http\Requests\StudentClass\UpdateStudentClassRequest;
@@ -68,12 +69,26 @@ class StudentClassController extends Controller
                 $guru_option .= '<option value="'.$guru->id.'">'.$guru->full_name.'</option>';
             }
         $guru_option .= '</select>';
+        
+        $data_kelas = ClassName::all();
+
+        $kelas_option = '<select class="form-control js-example-basic-single" name="class_name" id="class_name" style="width: 100%">';
+        foreach ($data_kelas as $kelas) {
+        $kelas_option .= '<option value="'.$kelas->class_name.'">'.$kelas->class_name.'</option>';
+            }
+        $kelas_option .= '</select>';
+
 
         $years = array_combine(range(date("Y"), 2001), range(date("Y"), 2001));
 
         if($this->getUserPermission('index class'))
         {
-            return view('student_class.index', ['active'=>'student_class','years'=>$years,'guru_option'=>$guru_option]);
+            return view('student_class.index', [
+    'active' => 'student_class',
+    'years' => $years,
+    'guru_option' => $guru_option,
+    'kelas_option' => $kelas_option 
+]);
         }
         else
         {
@@ -199,6 +214,27 @@ class StudentClassController extends Controller
             return json_encode($arr_data);
         }
     }
+
+public function getClassNames(Request $request)
+{
+    if ($request->ajax()) {
+        $query = ClassName::query();
+
+        if ($request->has('search') && $request->get('search') !== '') {
+            $query->where('class_name', 'like', '%' . $request->get('search') . '%');
+        }
+
+        $results = $query->get()->map(function ($item) {
+            return [
+                'id' => $item->class_name,
+                'text' => $item->class_name
+            ];
+        });
+
+        return response()->json($results);
+    }
+}
+
 
     /**
      *
