@@ -88,32 +88,38 @@ class AssessmentController extends Controller
     }
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            
-            if($this->getUserLogin()->account_type == User::ACCOUNT_TYPE_TEACHER)
-            {
-                $data = Siswa::where('teacher_id',$this->getUserLogin()->id)->join('tbl_class', 'tbl_siswa.class_id', '=', 'tbl_class.id')->get(['tbl_siswa.id','siswa_name','memorization_type','class_id']);
-            }
-            else
-            {
-                $data = Siswa::all();
-            }
+if ($request->ajax()) {
 
-			return Datatables::of($data)
-			    ->addIndexColumn()
-			    ->addColumn('action', function($row){  
-			        $btn = '<button name="btnAssessment" onclick="btnAss('.$row->id.')" type="button" class="btn btn-info"><span class="glyphicon glyphicon-edit"></span></button>';
-			        return $btn; 
-			    })
-			    ->addColumn('memorization_type', function(Siswa $value) {
-			        return Siswa::getHafalanMeaning($value->memorization_type);
-			    })
-			    ->addColumn('class_id', function(Siswa $class) {
-			        return $class->getClass->class_name.' ('.$class->getClass->angkatan.')';
-			    })
-			    ->rawColumns(['action'])
-			    ->toJson();
-        }
+    if ($this->getUserLogin()->account_type == User::ACCOUNT_TYPE_TEACHER) {
+        $data = Siswa::where('teacher_id', $this->getUserLogin()->id)
+            ->join('tbl_class', 'tbl_siswa.class_id', '=', 'tbl_class.id')
+            ->get(['tbl_siswa.id','siswa_name','memorization_type','class_id']);
+    } else {
+        $data = Siswa::all();
+    }
+
+return Datatables::of($data)
+    ->addIndexColumn()
+    ->addColumn('action', function ($row) {
+        return '<button name="btnAssessment" onclick="btnAss(' . $row->id . ')" type="button" class="btn btn-info"><span class="glyphicon glyphicon-edit"></span></button>';
+    })
+    ->addColumn('memorization_type_button', function (Siswa $value) {
+        $type = $value->memorization_type;
+        $label = Siswa::getHafalanMeaning($type);
+        $btnClass = $type == 20 ? 'btn-success' : 'btn-warning';
+        return '<button onclick="filterByType(' . $type . ')" class="btn ' . $btnClass . ' btn-xs">' . $label . '</button>';
+    })
+    ->addColumn('memorization_type_raw', function (Siswa $value) {
+        return $value->memorization_type;
+    })
+    ->addColumn('class_id', function (Siswa $class) {
+        return $class->getClass->class_name . ' (' . $class->getClass->angkatan . ')';
+    })
+    ->rawColumns(['action', 'memorization_type_button'])
+    ->toJson();
+
+}
+
 
         if($this->getUserPermission('index assessment'))
         {

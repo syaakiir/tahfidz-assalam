@@ -212,10 +212,13 @@ function callKelas() {
         placeholder: 'Pilih Nama Kelas',
         ajax: {
             url: base_url + '/student-class/get-class-names',
+            type: 'POST', // 🔥 PENTING: Ubah dari GET ke POST
             dataType: 'json',
-            data: function(params) {
+            delay: 250,
+            data: function (params) {
                 return {
-                    search: params.term
+                    search: params.term,
+                    _token: '{{ csrf_token() }}' // 🔥 WAJIB untuk POST di Laravel
                 };
             },
             processResults: function (data) {
@@ -226,6 +229,7 @@ function callKelas() {
         }
     });
 }
+
 
 
         $(function() {

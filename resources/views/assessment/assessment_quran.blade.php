@@ -30,7 +30,7 @@
         @endcomponent
     @endif
 
-    <a href="{{ request()->fullUrlWithQuery(['continue' => 'true']) }}" class="btn btn-success mb-3" id="btnLanjutkan">Lanjutkan Hafalan</a>
+    <a href="{{ request()->fullUrlWithQuery(['continue' => 'true']) }}" class="btn btn-success mb-3" id="btnLanjutkan">Lanjutkan</a>
 
     <div class="table-responsive">
         <table class="table table-bordered data-table display nowrap" style="width:100%">

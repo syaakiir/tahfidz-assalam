@@ -12,11 +12,11 @@ class ClassName extends Model
     protected $guard_name = 'web';
 
     protected $fillable = [
-        'name',
+        'class_name'
     ];
 
     public static $rules = [
-        'name' => 'required|string|max:255',
+        'class_name' => 'required|string|max:255',
     ];
 
     protected $hidden = [];
@@ -26,7 +26,7 @@ class ClassName extends Model
      */
     public static function validateName($name, $id = null)
     {
-        $query = self::where('name', $name);
+        $query = self::where('class_name', $name);
 
         if ($id !== null) {
             $query->where('id', '!=', $id);
@@ -41,7 +41,7 @@ class ClassName extends Model
     public static function getAll($search = null)
     {
         if ($search) {
-            return self::where('name', 'like', '%' . $search . '%')->get();
+            return self::where('class_name', 'like', '%' . $search . '%')->get();
         }
         return self::all();
     }
