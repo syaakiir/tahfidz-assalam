@@ -38,6 +38,9 @@ class UpdateAssessmentRequest extends FormRequest
                 'begin'         => 'integer',
                 'end'           => 'integer',
                 'feedback'          => 'string | nullable',
+                                'kelancaran'          => 'string | nullable',
+                'makharijul'          => 'string | nullable',
+                'tajwid'          => 'string | nullable',
             ];
         }
     }

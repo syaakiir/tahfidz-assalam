@@ -63,6 +63,9 @@ class AssessmentController extends Controller
             'group_ayat' => 'required|string',
             'ayat' => 'required|numeric|min:1',
             'note' => 'nullable|string',
+            'kelancaran' => 'nullable|string',
+            'tajwid' => 'nullable|string',
+            'makharijul' => 'nullable|string',
         ]);
 
         SiswaHasSurah::create([
@@ -71,6 +74,9 @@ class AssessmentController extends Controller
             'group_ayat' => $validated['group_ayat'],
             'ayat' => $validated['ayat'],
             'note' => $validated['note'] ?? null,
+            'kelancaran' => $validated['kelancaran'] ?? null,
+            'tajwid' => $validated['tajwid'] ?? null,
+            'makharijul' => $validated['makharijul'] ?? null,
             'date' => now(),
         ]);
 
@@ -199,6 +205,9 @@ return Datatables::of($data)
             $assessment_log->date = Carbon::now();
             $assessment_log->assessment = 'Surat '.Surah::findOrFail($request->get('surah_id'))->surah_name;
             $assessment_log->note = $request->get('note');
+            $assessment_log->kelancaran = $request->get('kelancaran');
+            $assessment_log->tajwid = $request->get('tajwid');
+            $assessment_log->makharijul = $request->get('makharijul');
 
             if(!$assessment_log->save())
             {
@@ -215,6 +224,9 @@ return Datatables::of($data)
                 $assessment->ayat = $ayat;
                 $assessment->date = Carbon::now();
                 $assessment->note = $request->get('note');
+                $assessment->makharijul = $request->get('makharijul');
+                $assessment->kelancaran = $request->get('kelancaran');
+                $assessment->tajwid = $request->get('tajwid');
                 $assessment->group_ayat = $request->get('begin').'-'.$request->get('end');
 
                 $old_data = SiswaHasSurah::AssessmentValidation($assessment->siswa_id,$assessment->surah_id,$assessment->ayat);
@@ -224,6 +236,9 @@ return Datatables::of($data)
                     $assessment = $old_data;
                     $assessment->date = Carbon::now();
                     $assessment->note = $request->get('note');
+                    $assessment->makharijul = $request->get('makharijul');
+                    $assessment->kelancaran = $request->get('kelancaran');
+                    $assessment->tajwid = $request->get('tajwid');
                     $assessment->group_ayat = $request->get('begin').'-'.$request->get('end');
                     $status_assessment = 'RENEW';
 

@@ -21,6 +21,9 @@ class AssessmentResource extends JsonResource
             'date' => $this->date,
             'assessment' => $this->assessment,
             'feedback' => $this->feedback,
+            'kelancaran' => $this->kelancaran,
+            'makharijul' => $this->makharijul,
+            'tajwid' => $this->tajwid,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

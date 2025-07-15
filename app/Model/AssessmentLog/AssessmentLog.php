@@ -21,6 +21,9 @@ class AssessmentLog extends Model
         'range',
         'date',
         'assessment',
+        'kelancaran',
+        'makharijul',
+        'tajwid',
         'feedback'
     ];
 
@@ -29,6 +32,9 @@ class AssessmentLog extends Model
         'range' => 'required | string',
         'date' => 'required | date',
         'assessment' => 'required | string',
+        'kelancaran' => 'required | string',
+        'makharijul' => 'required | string',
+        'tajwid' => 'required | string',
         'feedback' => 'required | string',
     ];
 

@@ -38,6 +38,9 @@
                 <tr>
                     <th width="30%">Surat </th>
                     <th width="20%">Ayat </th>
+                    <th width="10%">Kelancaran </th>
+                    <th width="10%">Tajwid </th>
+                    <th width="10%">Makharijul Huruf </th>
                     <th width="20%">Nilai </th>
                     <th width="50%">Tanggal </th>
                     <th width="50%">Feedback </th>
@@ -56,7 +59,7 @@
             <input type="text" class="form-control" value="{{ $data_siswa->siswa_name }}" disabled>
         </div>
 
-        <div class="form-group">
+      <div class="form-group">
             <label>Surat </label>
             <select class="js-example-basic-single form-control" name="surah_id" id="surah_id" style="width: 100%;">
                 <option></option>
@@ -87,6 +90,74 @@
                 </div>
             @endif
         </div>
+{{-- <div class="form-group">
+    <label>Halaman</label>
+    <select class="form-control js-example-basic-single" name="halaman" id="halaman" style="width: 100%;">
+        <option></option>
+        @for ($i = 1; $i <= 604; $i++)
+            <option value="{{ $i }}">Halaman {{ $i }}</option>
+        @endfor
+    </select>
+    @if ($errors->has('halaman'))
+        <div class="error">
+            <p style="color: red"><span>&#42;</span> {{ $errors->first('halaman') }}</p>
+        </div>
+    @endif
+</div> --}}
+
+
+<div class="form-group row">
+    <div class="col-md-4">
+        <label>Kelancaran</label>
+        <select class="form-control" name="kelancaran">
+            <option value="">-- Pilih Nilai --</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+        </select>
+        @if ($errors->has('kelancaran'))
+            <div class="error">
+                <p style="color: red"><span>&#42;</span> {{ $errors->first('kelancaran') }}</p>
+            </div>
+        @endif
+    </div>
+
+    <div class="col-md-4">
+        <label>Makharijul Huruf</label>
+        <select class="form-control" name="makharijul">
+            <option value="">-- Pilih Nilai --</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+        </select>
+        @if ($errors->has('makharijul'))
+            <div class="error">
+                <p style="color: red"><span>&#42;</span> {{ $errors->first('makharijul') }}</p>
+            </div>
+        @endif
+    </div>
+
+    <div class="col-md-4">
+        <label>Tajwid</label>
+        <select class="form-control" name="tajwid">
+            <option value="">-- Pilih Nilai --</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+        </select>
+        @if ($errors->has('tajwid'))
+            <div class="error">
+                <p style="color: red"><span>&#42;</span> {{ $errors->first('tajwid') }}</p>
+            </div>
+        @endif
+    </div>
+</div>
 
         <div class="form-group">
             <label>Nilai </label>
@@ -118,6 +189,15 @@
     var total_ayat;
     var table;
 
+    $(document).ready(function() {
+        // Inisialisasi semua select2
+        $('.js-example-basic-single').select2({
+            placeholder: "Pilih",
+            allowClear: true
+        });
+    });
+
+
     function populateAyatDropdown(totalAyat) {
         let options = '<option></option>';
         for (let i = 1; i <= totalAyat; i++) {
@@ -148,6 +228,9 @@
             columns: [
                 { data: 'assessment', name: 'assessment' },
                 { data: 'range', name: 'range' },
+                { data: 'tajwid', name: 'tajwid' },
+                { data: 'kelancaran', name: 'kelancaran' },
+                { data: 'makharijul', name: 'makharijul' },
                 { data: 'note', name: 'note' },
                 { data: 'date', name: 'date' },
                 { data: 'feedback', name: 'feedback' },
@@ -195,6 +278,7 @@
             });
         });
 
+
         $('#end').on('change', function () {
             const beginVal = parseInt($('#begin').val());
             const endVal = parseInt($(this).val());
@@ -208,6 +292,7 @@
             }
         });
     });
+    
 
     @if(request()->get('continue') == 'true')
     setTimeout(() => {
